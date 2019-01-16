@@ -52,10 +52,12 @@ bool Button::is_released() {
     return released;
 }
 
+/** Return true if button is up */
 bool Button::is_up() {
     return (history == BUTTON_UP);
 }
 
+/** Return true if button is down */
 bool Button::is_down() {
     return (history == BUTTON_DOWN);
 }

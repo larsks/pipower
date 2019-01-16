@@ -194,6 +194,7 @@ void loop() {
         }
     }
 
+    // At any point, a long press will force the power off.
     if (long_press) {
         to_state(STATE_POWEROFF2);
     }
