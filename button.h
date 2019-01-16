@@ -21,7 +21,7 @@ class Button {
 
     private:
         int pin;
-        uint16_t history;
+        uint8_t history;
 };
 
 #endif
