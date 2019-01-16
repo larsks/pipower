@@ -1,0 +1,13 @@
+[Unit]
+Description = [pipower] Monitor power
+Conflicts = powerloss-cancel.service
+
+[Service]
+Type = simple
+Environment=PIN_USB=17
+EnvironmentFile=-/etc/default/pipower
+ExecStart = /usr/bin/gpio -g wfi $PIN_USB falling
+ExecStop = /bin/systemctl start powerloss-cancel.service powerloss-shutdown.timer
+
+[Install]
+WantedBy = multi-user.target

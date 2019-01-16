@@ -1,0 +1,12 @@
+[Unit]
+Description = [pipower] Monitor power button
+
+[Service]
+Type = simple
+Environment=PIN_POWER=27
+EnvironmentFile=-/etc/default/pipower
+ExecStart = /usr/bin/gpio -g wfi $PIN_POWER rising
+ExecStop = /bin/systemctl poweroff
+
+[Install]
+WantedBy = multi-user.target

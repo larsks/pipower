@@ -1,0 +1,13 @@
+[Unit]
+Description = [pipower] Cancel shutdown if power is restored
+
+[Service]
+Type = simple
+Environment=PIN_USB=17
+EnvironmentFile=-/etc/default/pipower
+ExecStart = /usr/bin/gpio -g wfi $PIN_USB rising
+ExecStop = /bin/systemctl stop powerloss-shutdown.timer
+ExecStop = /bin/systemctl start powerloss.service
+
+[Install]
+WantedBy = multi-user.target

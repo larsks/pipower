@@ -1,0 +1,14 @@
+[Unit]
+Description = [pipower] Assert BOOT signal on system boot
+
+[Service]
+Type = oneshot
+Environment=PIN_BOOT=4
+EnvironmentFile=-/etc/default/pipower
+RemainAfterExit = true
+ExecStart = /usr/bin/gpio -g mode $PIN_BOOT output
+ExecStart = /usr/bin/gpio -g write $PIN_BOOT 0
+ExecStop = /usr/bin/gpio -g write $PIN_BOOT 1
+
+[Install]
+WantedBy = multi-user.target

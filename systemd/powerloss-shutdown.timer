@@ -1,0 +1,8 @@
+[Unit]
+Description = [pipower] Power loss timer
+
+[Timer]
+OnActiveSec = 30
+
+[Install]
+WantedBy = multi-user.target
