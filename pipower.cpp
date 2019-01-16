@@ -8,6 +8,8 @@
 #include <avr/io.h>
 #include "button.h"
 #include "millis.h"
+#include "pins.h"
+#include "states.h"
 
 /** \defgroup BitOps Bit operations
  * @{
@@ -17,18 +19,6 @@
 #define ROR8(N) ((uint8_t)(N >> 1) | (N << 7))      /**< Rotate right, 8-bit version */
 #define ROL16(N) ((uint16_t)(N << 1) | (N >> 15))   /**< Rotate left, 16-bit version */
 #define ROR16(N) ((uint16_t)(N >> 1) | (N << 15))   /**< Rotate right, 16-bit version */
-
-/** @} */
-
-/** \defgroup Pins Pin definitions
- * @{
- */
-
-#define PIN_LED PB0         /**< Status LED */
-#define PIN_POWER PB1       /**< Power button */
-#define PIN_EN PB2          /**< EN to Powerboost */
-#define PIN_BOOT PB3        /**< BOOT signal from Pi */
-#define PIN_SHUTDOWN PB4    /**< SHUTDOWN signal to Pi */
 
 /** @} */
 
@@ -49,24 +39,6 @@
 #define TIMER_BOOTWAIT (30 * ONE_SECOND)    /**< How long to wait for boot */
 #define TIMER_SHUTDOWN (30 * ONE_SECOND)    /**< How long to wait for shutdown */
 #define TIMER_POWEROFF (30 * ONE_SECOND)    /**< How long to wait for power off */
-
-/** @} */
-
-/** \defgroup States States
- * @{
- */
-
-#define STATE_START     0   /**< Power has just been applied to mc */
-#define STATE_POWERON   1   /**< Assert EN */
-#define STATE_BOOTWAIT0 2   /**< Set bootwait timer */
-#define STATE_BOOTWAIT1 3   /**< Wait for Pi to assert BOOT or timer expiry */
-#define STATE_BOOT      4   /**< System has booted */
-#define STATE_SHUTDOWN0 5   /**< Set shutdown timer */
-#define STATE_SHUTDOWN1 6   /**< Wait for Pi to de-assert BOOT or timer expiry */
-#define STATE_POWEROFF0 7   /**< Set poweroff timer */
-#define STATE_POWEROFF1 8   /**< Wait for timer expiry */
-#define STATE_POWEROFF2 9   /**< Power off */
-#define STATE_IDLE      10  /**< Wait for power button press */
 
 /** @} */
 
