@@ -1,3 +1,7 @@
+/**
+ * \file pins.h
+ */
+
 #ifndef _pins_h
 #define _pins_h
 

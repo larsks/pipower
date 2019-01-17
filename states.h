@@ -1,3 +1,7 @@
+/**
+ * \file states.h
+ */
+
 #ifndef _states_h
 #define _states_h
 
