@@ -3,9 +3,9 @@ Description = [pipower] Monitor SHUTDOWN signal
 
 [Service]
 Type = simple
-Environment=PIN_POWER=27
+Environment=PIN_SHUTDOWN=27
 EnvironmentFile=-/etc/default/pipower
-ExecStart = /usr/bin/gpio -g wfi $PIN_POWER rising
+ExecStart = /usr/bin/gpio -g wfi $PIN_SHUTDOWN rising
 ExecStop = /bin/systemctl poweroff
 
 [Install]

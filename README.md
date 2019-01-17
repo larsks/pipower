@@ -1,32 +1,56 @@
 # PiPower
 
-This contains code that will let an ATtiny85 act as a controller between a Raspberry Pi and an Adafruit [Powerboost 1000c][].
+Turn an Adafruit [PowerBoost 1000c][] into a UPS with the help of an [ATtiny85][] microcontroller.
 
 [powerboost 1000c]: https://www.adafruit.com/product/2465
+[attiny85]: https://www.microchip.com/wwwproducts/en/ATtiny85
 
+## Theory of operation
+
+PiPower is designed to ensure that your Pi will shut down cleanly when it is disconnected from its primary power source.
+
+PiPower runs on an ATtiny85 microcontroller and acts as an intermediary between your Raspberry Pi and an Adafruit PowerBoost 1000c.  When the microcontroller (mc) boots, it checks to see if an external power source is available to the PowerBoost.  If so, it sets the `EN` line and the PowerBoost starts to supply power to the Pi.
+
+If no external power is available, the mc enters a low power sleep mode until external power is applied.  At this point, it will boot the Pi.
+
+When the Pi boots, it must signal to the mc that it has booted successfully by bringing the `BOOT` line low. If the mc does not receive this signal within 30 seconds of providing power, it will turn off the power and return to the low power mode.
+
+If external power is lost while the Pi is running, or if you press the power button while the Pi is running, the mc will send the `SHUTDOWN` signal to the Pi.  It will then wait up to 30 seconds for the Pi to shut down.  The Pi can signal a clean shutdown by setting the `BOOT` line high.  Once the shutdown is complete (or if 30 seconds pass), the mc will remove power from the Pi and return to low power mode.
+
+## Pins
+
+- `PB0` - `USB` line from PowerBoost
+- `PB1` - power button
+- `PB2` - `ENABLE` line to PowerBoost
+- `PB3` - `BOOT` signal from Raspberry Pi
+- `PB4` - `SHUTDOWN` signal to Raspberry Pi
 
 ## Systemd units
 
-- `assert-boot.service`
+You can configure these services by creating the file `/etc/default/pipower` and setting one or more of `PIN_SHUTDOWN` and `PIN_BOOT`.
 
-  Asserts the `BOOT` signal when the Pi boots and de-asserts it on shutdown.
+- `pipower-up.service`
 
-- `power-button.service`
+  Asserts the `BOOT` signal on `PIN_BOOT` when the Pi boots and de-asserts it on shutdown.
 
-  Responds to `SHUTDOWN` signal from power controller by powering off the Pi.
+- `pipower-down.service`
 
-- `powerloss.service`
+  Responds to the `SHUTDOWN` signal on `PIN_SHUTDOWN` from power controller by powering off the Pi.
 
-  Responds to loss of `USB` signal from power controller by starting the powerloss shutdown timer.  The timer will trigger a shutdown when it expires. If power is restored prior to the timer expiring, the timer will be cancelled.
+## License
 
-- `powerloss-cancel.service`
+PiPower, a UPS for your Raspberry Pi
+Copyright (C) 2019 Lars Kellogg-Stedman <lars@oddbit.com>
 
-  Cancels the powerloss shutdown timer.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-- `powerloss-shutdown.service`
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-  Shuts down the system.  Triggered by the powerloss shutdown timer.
-
-- `powerloss-shutdown.timer`
-
-  This is the power loss shutdown timer. It is started by the `powerloss` service when a power loss is detected. Upon expiry it will trigger the `powerloss-shutdown` service.
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
