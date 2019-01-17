@@ -69,7 +69,7 @@ unsigned long time_pressed;             /**< Current press duration */
 /** Current run state.
   * \ingroup States
   */
-uint8_t state = 0;
+enum STATE state = STATE_START;
 
 Input usb(PIN_USB, false);
 
@@ -96,7 +96,7 @@ void setup() {
   *
   * \ingroup States
   */
-void to_state(uint8_t new_state) {
+void to_state(enum STATE new_state) {
     state = new_state;
 }
 
