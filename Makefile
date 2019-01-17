@@ -19,6 +19,9 @@ all:	$(PROGNAME).hex
 %.o: %.cpp
 	$(CPP) $(CFLAGS) -c $< -o $@
 
+%.pre: %.cpp
+	$(CPP) $(CFLAGS) -E $< -o $@
+
 %.o: %.S
 	$(CC) $(CFLAGS) -x assembler-with-cpp -c $< -o $@
 
