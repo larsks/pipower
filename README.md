@@ -31,11 +31,16 @@ You can configure these services by creating the file `/etc/default/pipower` and
 
 - `pipower-up.service`
 
-  Asserts the `BOOT` signal on `PIN_BOOT` when the Pi boots and de-asserts it on shutdown.
+  Asserts the `BOOT` signal on `PIN_BOOT` (default `GPIO4`) when the Pi boots and de-asserts it on shutdown.
 
 - `pipower-down.service`
 
-  Responds to the `SHUTDOWN` signal on `PIN_SHUTDOWN` from power controller by powering off the Pi.
+  Responds to the `SHUTDOWN` signal on `PIN_SHUTDOWN` (default `GPIO17`) from power controller by powering off the Pi.
+
+## See also
+
+- [PowerBoost 1000c data sheets/pinouts/etc](https://learn.adafruit.com/adafruit-powerboost-1000c-load-share-usb-charge-boost/downloads)
+- [ATtiny85 data sheet](https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2586-AVR-8-bit-Microcontroller-ATtiny25-ATtiny45-ATtiny85_Datasheet.pdf)
 
 ## License
 
