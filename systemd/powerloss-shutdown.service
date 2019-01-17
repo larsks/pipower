@@ -1,6 +1,0 @@
-[Unit]
-Description = [pipower] Power off system
-
-[Service]
-Type = simple
-ExecStart = /bin/systemctl poweroff
