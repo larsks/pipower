@@ -18,7 +18,8 @@ Input::Input(int _pin, bool pullup) {
 	    PORTB |= 1<<pin;
     }
 
-    last_state = state = 0;
+    update();
+    last_state = state;
 }
 
 void Input::update() {
