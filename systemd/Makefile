@@ -2,12 +2,13 @@ sysconfdir = /etc
 unitdir = $(sysconfdir)/systemd/system
 
 UNITS = \
-	assert-boot.service \
-	power-button.service \
-	powerloss-cancel.service \
-	powerloss.service \
-	powerloss-shutdown.service \
-	powerloss-shutdown.timer
+	pipower-up.service \
+	pipower-down.service
+
+#	powerloss-cancel.service \
+#	powerloss.service \
+#	powerloss-shutdown.service \
+#	powerloss-shutdown.timer
 
 all:
 
@@ -16,4 +17,4 @@ install:
 
 activate: install
 	systemctl daemon-reload
-	systemctl enable --now assert-boot power-button powerloss
+	systemctl enable --now pipower-up pipower-down

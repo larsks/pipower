@@ -1,5 +1,5 @@
 [Unit]
-Description = [pipower] Monitor power button
+Description = [pipower] Monitor SHUTDOWN signal
 
 [Service]
 Type = simple

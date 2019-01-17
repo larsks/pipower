@@ -1,5 +1,5 @@
 [Unit]
-Description = [pipower] Assert BOOT signal on system boot
+Description = [pipower] Assert BOOT signal
 
 [Service]
 Type = oneshot
