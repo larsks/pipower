@@ -39,7 +39,7 @@ You can configure these services by creating the file `/etc/default/pipower` and
 
 ## License
 
-PiPower, a UPS for your Raspberry Pi
+PiPower, a UPS for your Raspberry Pi  
 Copyright (C) 2019 Lars Kellogg-Stedman <lars@oddbit.com>
 
 This program is free software: you can redistribute it and/or modify
