@@ -9,19 +9,23 @@
 #define _button_h
 
 #include <stdint.h>
+#include <stdbool.h>
 
-class Button {
-    public:
-        Button(int pin);
-        void update();
-        bool is_pressed();
-        bool is_released();
-        bool is_up();
-        bool is_down();
-
-    private:
-        int pin;
-        uint8_t history;
-};
-
+#ifdef __cplusplus
+extern "C" {
 #endif
+
+typedef struct Button Button;
+
+extern Button *button_new(uint8_t pin);
+extern void button_update(Button *);
+extern bool button_is_pressed(Button *);
+extern bool button_is_released(Button *);
+extern bool button_is_up(Button *);
+extern bool button_is_down(Button *);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif // _button_h

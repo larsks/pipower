@@ -2,7 +2,7 @@ PROGNAME    = pipower
 DEVICE      = attiny85
 CLOCK       = 1000000
 PROGRAMMER  = -c arduino 
-OBJECTS     = button.o pipower.o millis.o input.o
+OBJECTS     = pipower.o millis.o button.o input.o
 FUSES       = -U lfuse:w:0x62:m -U hfuse:w:0xdf:m -U efuse:w:0xff:m 
 PORT	    = -P /dev/ttyACM0 -b19200
 AVRDUDE     = avrdude -v $(PORT) $(PROGRAMMER) -p $(DEVICE)
@@ -18,6 +18,9 @@ all:	$(PROGNAME).hex
 
 %.o: %.cpp
 	$(CPP) $(CFLAGS) -c $< -o $@
+
+%.pre: %.c
+	$(CPP) $(CFLAGS) -E $< -o $@
 
 %.pre: %.cpp
 	$(CPP) $(CFLAGS) -E $< -o $@

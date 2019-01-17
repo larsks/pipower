@@ -5,20 +5,23 @@
 #define _input_h
 
 #include <stdint.h>
+#include <stdbool.h>
 
-class Input {
-    public:
-        Input(int pin, bool pullup);
-        void update();
-        bool went_high();
-        bool went_low();
-        bool is_high();
-        bool is_low();
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-    private:
-        int pin;
-	bool state,
-	     last_state;
-};
+typedef struct Input Input;
+
+extern Input *input_new(int pin, bool pullup);
+extern void input_update(Input *);
+extern bool input_went_high(Input *);
+extern bool input_went_low(Input *);
+extern bool input_is_high(Input *);
+extern bool input_is_low(Input *);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
