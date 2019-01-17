@@ -150,7 +150,7 @@ void loop() {
         power_button.update();
 
         if (power_button_state == BUTTON_IGNORE) {
-            if (power_button.is_pressed()) {
+            if (power_button.is_released()) {
                 power_button_state = BUTTON_NORMAL;
             }
         } else if (power_button.is_pressed()) {
