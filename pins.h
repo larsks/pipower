@@ -5,7 +5,6 @@
  * @{
  */
 
-#define PIN_LED PB0         /**< Status LED */
 #define PIN_USB PB0         /**< USB signal from Powerboost */
 #define PIN_POWER PB1       /**< Power button */
 #define PIN_EN PB2          /**< EN to Powerboost */

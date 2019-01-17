@@ -6,6 +6,9 @@
 
 #include <stdint.h>
 #include <avr/io.h>
+#include <avr/interrupt.h>
+#include <avr/sleep.h>
+
 #include "button.h"
 #include "millis.h"
 #include "input.h"
@@ -40,6 +43,7 @@
 #define TIMER_BOOTWAIT (30 * ONE_SECOND)    /**< How long to wait for boot */
 #define TIMER_SHUTDOWN (30 * ONE_SECOND)    /**< How long to wait for shutdown */
 #define TIMER_POWEROFF (30 * ONE_SECOND)    /**< How long to wait for power off */
+#define TIMER_IDLE (5 * ONE_SECOND)
 
 /** @} */
 
@@ -69,6 +73,8 @@ uint8_t state = 0;
 
 Input usb(PIN_USB, false);
 
+EMPTY_INTERRUPT(PCINT0_vect);
+
 /** Run once when mc boots. */
 void setup() {
     // PIN_EN and PIN_SHUTDOWN are outputs
@@ -76,6 +82,10 @@ void setup() {
 
     // Enable pullup on PIN_BOOT and PIN_POWER
     PORTB |= 1<<PIN_BOOT | 1<<PIN_POWER;
+
+    // Enable pin change interrupts
+    GIMSK |= 1<<PCIE;
+    PCMSK |= 1<<(PIN_POWER) | 1<<(PIN_USB);
 
     init_millis();
 }
@@ -220,12 +230,28 @@ void loop() {
             // De-assert EN and SHUTDOWN
             PORTB &= ~(1<<PIN_EN);
             PORTB &= ~(1<<PIN_SHUTDOWN);
-            to_state(STATE_IDLE);
+            to_state(STATE_IDLE0);
             break;
 
-        case STATE_IDLE:
-            // Wait for power button.
-            if (short_press || usb.went_high()) {
+        case STATE_IDLE0:
+            // Enter low power mode.
+            set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+            sleep_mode();
+            to_state(STATE_IDLE1);
+
+        case STATE_IDLE1:
+            timer_start = now;
+            to_state(STATE_IDLE2);
+
+        case STATE_IDLE2:
+            if (now - timer_start > TIMER_IDLE) {
+                // return to low power mode if nothing to do
+                to_state(STATE_IDLE0);
+            } else if (short_press && usb.is_high()) {
+                // power on if power button pressed and power is available
+                to_state(STATE_POWERON);
+            } else if (usb.went_high()) {
+                // power on if power is restored
                 to_state(STATE_POWERON);
             }
             break;
