@@ -5,10 +5,6 @@
 #ifndef _states_h
 #define _states_h
 
-/** \defgroup States States
- * @{
- */
-
 enum STATE {
     STATE_START,        /**< Power has just been applied to mc */
     STATE_POWERWAIT0,   /**< Set powerwait timer */
@@ -26,7 +22,5 @@ enum STATE {
     STATE_IDLE1,        /**< Start idle timer */
     STATE_IDLE2,        /**< Wait for power button press */
 };
-
-/** @} */
 
 #endif // _states_h

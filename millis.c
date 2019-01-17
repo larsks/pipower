@@ -1,5 +1,9 @@
 /**
  * \file millis.c
+ *
+ * Provide an analog of the Arduino `millis()` function. This implementation
+ * uses `TIMER0` with a `/64` divider, which will allow it to operate with a
+ * clock frequency of up to 16Mhz.
  */
 
 #include <avr/interrupt.h>

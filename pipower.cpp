@@ -15,17 +15,6 @@
 #include "pins.h"
 #include "states.h"
 
-/** \defgroup BitOps Bit operations
- * @{
- */
-
-#define ROL8(N) ((uint8_t)(N << 1) | (N >> 7))      /**< Rotate left, 8-bit version */
-#define ROR8(N) ((uint8_t)(N >> 1) | (N << 7))      /**< Rotate right, 8-bit version */
-#define ROL16(N) ((uint16_t)(N << 1) | (N >> 15))   /**< Rotate left, 16-bit version */
-#define ROR16(N) ((uint16_t)(N >> 1) | (N << 15))   /**< Rotate right, 16-bit version */
-
-/** @} */
-
 /** \defgroup Button Power button
  * @{
  */
@@ -66,13 +55,17 @@ uint8_t power_button_state = BUTTON_NORMAL; /**< Power button current state */
 unsigned long time_pressed;             /**< Current press duration */
 /** @} */
 
-/** Current run state.
-  * \ingroup States
-  */
+/** Current run state. */
 enum STATE state = STATE_START;
 
 Input usb(PIN_USB, false);
 
+/** Trigger wake from power-down mode on pin change interrupt.
+ *
+ * We rely on the pin change interrupt to wake from `SLEEP_PWRDOWN` mode, 
+ * but we do not otherwise need to handle the interrupt, so this is a
+ * do-nothing routine.
+ */
 EMPTY_INTERRUPT(PCINT0_vect);
 
 /** Run once when mc boots. */
@@ -88,16 +81,6 @@ void setup() {
     PCMSK |= 1<<(PIN_POWER) | 1<<(PIN_USB);
 
     init_millis();
-}
-
-/** Transition to a new state.
-  *
-  * This sets the global `state` variable.
-  *
-  * \ingroup States
-  */
-void to_state(enum STATE new_state) {
-    state = new_state;
 }
 
 /** Runs periodically */
@@ -133,10 +116,8 @@ void loop() {
 
     // At any point, a long press will force the power off.
     if (long_press) {
-        to_state(STATE_POWEROFF2);
+        state = STATE_POWEROFF2;
     }
-
-    //PORTB = (PORTB & ~(1<<PIN_SHUTDOWN)) | (usb.is_high()?1:0)<<PIN_SHUTDOWN;
 
     switch(state) {
         case STATE_START:
@@ -144,53 +125,53 @@ void loop() {
                 // USB goes high briefly when the microcontroller starts
                 // up. Wait a second for it to stabilize before we try to
                 // boot.
-                to_state(STATE_POWERWAIT0);
+                state = STATE_POWERWAIT0;
             } else {
-                to_state(STATE_POWEROFF2);
+                state = STATE_POWEROFF2;
             }
             break;
 
         case STATE_POWERWAIT0:
             // start powerwait timer
             timer_start = now;
-            to_state(STATE_POWERWAIT1);
+            state = STATE_POWERWAIT1;
             break;
 
         case STATE_POWERWAIT1:
             if (usb.went_low()) {
-                to_state(STATE_POWEROFF2);
+                state = STATE_POWEROFF2;
             } else if (now - timer_start > TIMER_POWERWAIT) {
-                to_state(STATE_POWERON);
+                state = STATE_POWERON;
             }
             break;
 
         case STATE_POWERON:
             // Assert EN
             PORTB |= 1<<PIN_EN;
-            to_state(STATE_BOOTWAIT0);
+            state = STATE_BOOTWAIT0;
             break;
 
         case STATE_BOOTWAIT0:
             // Start bootwait timer
             timer_start = now;
-            to_state(STATE_BOOTWAIT1);
+            state = STATE_BOOTWAIT1;
             break;
 
         case STATE_BOOTWAIT1:
             // Wait for Pi to assert BOOT or timeout
             if (now - timer_start > TIMER_BOOTWAIT) {
-                to_state(STATE_POWEROFF2);
+                state = STATE_POWEROFF2;
             } else if (!(PINB & (1<<PIN_BOOT))) {
-                to_state(STATE_BOOT);
+                state = STATE_BOOT;
             }
             break;
 
         case STATE_BOOT:
             // Wait for power button or Pi to de-assert BOOT
             if (short_press || usb.went_low()) {
-                to_state(STATE_SHUTDOWN0);
+                state = STATE_SHUTDOWN0;
             } else if (PINB & (1<<PIN_BOOT)) {
-                to_state(STATE_POWEROFF0);
+                state = STATE_POWEROFF0;
             }
             break;
 
@@ -198,15 +179,15 @@ void loop() {
             // Assert SHUTDOWN
             PORTB |= 1<<PIN_SHUTDOWN;
             timer_start = now;
-            to_state(STATE_SHUTDOWN1);
+            state = STATE_SHUTDOWN1;
             break;
 
         case STATE_SHUTDOWN1:
             // Wait for Pi to de-assert BOOT or timeout
             if (now - timer_start > TIMER_SHUTDOWN) {
-                to_state(STATE_POWEROFF0);
+                state = STATE_POWEROFF0;
             } else if (PINB & (1<<PIN_BOOT)) {
-                to_state(STATE_POWEROFF0);
+                state = STATE_POWEROFF0;
             }
             break;
 
@@ -214,15 +195,15 @@ void loop() {
             // Start poweroff timer
             PORTB &= ~(1<<PIN_SHUTDOWN);
             timer_start = now;
-            to_state(STATE_POWEROFF1);
+            state = STATE_POWEROFF1;
 
         case STATE_POWEROFF1:
             // Wait for poweroff timer to expire.
             if (now - timer_start > TIMER_POWEROFF) {
-                to_state(STATE_POWEROFF2);
+                state = STATE_POWEROFF2;
             } else if (!(PINB & (1<<PIN_BOOT))) {
                 // Pi has re-asserted BOOT
-                to_state(STATE_BOOT);
+                state = STATE_BOOT;
             }
             break;
 
@@ -230,38 +211,38 @@ void loop() {
             // De-assert EN and SHUTDOWN
             PORTB &= ~(1<<PIN_EN);
             PORTB &= ~(1<<PIN_SHUTDOWN);
-            to_state(STATE_IDLE0);
+            state = STATE_IDLE0;
             break;
 
         case STATE_IDLE0:
             // Enter low power mode.
             set_sleep_mode(SLEEP_MODE_PWR_DOWN);
             sleep_mode();
-            to_state(STATE_IDLE1);
+            state = STATE_IDLE1;
 
         case STATE_IDLE1:
             timer_start = now;
-            to_state(STATE_IDLE2);
+            state = STATE_IDLE2;
 
         case STATE_IDLE2:
             if (now - timer_start > TIMER_IDLE) {
                 // return to low power mode if nothing to do
-                to_state(STATE_IDLE0);
+                state = STATE_IDLE0;
             } else if (short_press && usb.is_high()) {
                 // power on if power button pressed and power is available
-                to_state(STATE_POWERON);
+                state = STATE_POWERON;
             } else if (usb.went_high()) {
                 // power on if power is restored
-                to_state(STATE_POWERON);
+                state = STATE_POWERON;
             }
             break;
     }
 }
 
 int main() {
-	setup();
+    setup();
 
-	while (1) {
-		loop();
-	}
+    while (1) {
+        loop();
+    }
 }
