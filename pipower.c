@@ -36,15 +36,8 @@
 
 /** @} */
 
-/** Set to the current value of `millis()` on each loop iteration. */
-unsigned long now;
-
-/** \addtogroup Timers
- * @{
- */
-unsigned long timer_button = 0; /**< How often to check button state */
+unsigned long now;  /**< Set to the current value of `millis()` on each loop iteration. */
 unsigned long timer_start = 0;  /**< Generic timer used in state transitions */
-/** @} */
 
 /** \addtogroup Button
  * @{
@@ -79,7 +72,7 @@ void setup() {
     // GIMSK here).
     PCMSK |= 1<<(PIN_POWER) | 1<<(PIN_USB);
 
-    power_button = button_new(PIN_POWER);
+    power_button = button_new(PIN_POWER, TIMER_BUTTON);
     usb = input_new(PIN_USB, false);
     boot = input_new(PIN_BOOT, true);
 
@@ -105,27 +98,22 @@ void loop() {
     now = millis();
     input_update(usb);
     input_update(boot);
+    button_update(power_button);
 
-    if (now - timer_button > TIMER_BUTTON) {
-        timer_button = now;
-
-        // Manage power button
-        button_update(power_button);
-
-        if (power_button_state == BUTTON_IGNORE) {
-            if (button_is_released(power_button)) {
-                power_button_state = BUTTON_NORMAL;
-            }
-        } else if (button_is_pressed(power_button)) {
-            time_pressed = now;
-        } else if (button_is_released(power_button)) {
-            short_press = 1;
-        } else if (button_is_down(power_button)) {
-            unsigned long delta = now - time_pressed;
-            if (delta > LONG_PRESS_DURATION) {
-                long_press = 1;
-                power_button_state = BUTTON_IGNORE;
-            }
+    // Detect short and long presses
+    if (power_button_state == BUTTON_IGNORE) {
+        if (button_is_released(power_button)) {
+            power_button_state = BUTTON_NORMAL;
+        }
+    } else if (button_is_pressed(power_button)) {
+        time_pressed = now;
+    } else if (button_is_released(power_button)) {
+        short_press = 1;
+    } else if (button_is_down(power_button)) {
+        unsigned long delta = now - time_pressed;
+        if (delta > LONG_PRESS_DURATION) {
+            long_press = 1;
+            power_button_state = BUTTON_IGNORE;
         }
     }
 

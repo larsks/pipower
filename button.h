@@ -17,8 +17,8 @@ extern "C" {
 
 typedef struct Button Button;
 
-extern Button *button_new(uint8_t pin);
-extern void button_destryo(Button *);
+extern Button *button_new(uint8_t pin, uint8_t poll_freq);
+extern void button_destroy(Button *);
 extern void button_update(Button *);
 extern bool button_is_pressed(Button *);
 extern bool button_is_released(Button *);

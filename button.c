@@ -11,6 +11,7 @@
 #include <avr/io.h>
 
 #include "button.h"
+#include "millis.h"
 
 #define BUTTON_RELEASED 0b00000111  /**< History pattern when a button is released */
 #define BUTTON_PRESSED  0b11000000  /**< History pattern when a button is pressed */
@@ -20,14 +21,18 @@
 
 typedef struct Button {
     uint8_t pin,        /**< Pin to which button is attached */
-            history;    /**< Button state history */
+            history,    /**< Button state history */
+            poll_freq,  /**< How often (in ms) to check button state */
+            last_poll;  /**< Time at which we last checked button state */
 } Button;
 
 /** Create a new Button object. */
-Button *button_new(uint8_t pin) {
+Button *button_new(uint8_t pin, uint8_t poll_freq) {
     Button *button = (Button *)malloc(sizeof(Button));
     button->pin = pin;
     button->history = BUTTON_UP;
+    button->poll_freq = poll_freq;
+    button->last_poll = 0;
 
     // ensure pin is an input
     DDRB &= ~(1<<pin);
@@ -45,8 +50,13 @@ void button_delete(Button *button) {
 
 /** Push current button state onto history. */
 void button_update(Button *button) {
-    button->history = button->history << 1;
-    button->history |= (PINB & (1<<button->pin))>>button->pin;
+    unsigned long now = millis();
+
+    if (now - button->last_poll >= button->poll_freq) {
+        button->history = button->history << 1;
+        button->history |= (PINB & (1<<button->pin))>>button->pin;
+        button->last_poll = now;
+    }
 }
 
 /** Return true if button has been pressed. */
