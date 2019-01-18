@@ -5,6 +5,12 @@ Turn an Adafruit [PowerBoost 1000c][] into a UPS with the help of an [ATtiny85][
 [powerboost 1000c]: https://www.adafruit.com/product/2465
 [attiny85]: https://www.microchip.com/wwwproducts/en/ATtiny85
 
+## Caveats
+
+The PowerBoost 1000c can only provide about 1.1A, which may not be sufficient to power a Raspberry Pi 3(+).  According to the [FAQ][], the Pi 3 may draw up to 1.2A under load. The typical current draw is listed as around 500mA, which would be fine.
+
+[FAQ]: https://www.raspberrypi.org/documentation/faqs/#pi-power
+
 ## Theory of operation
 
 PiPower is designed to ensure that your Pi will shut down cleanly when it is disconnected from its primary power source.
