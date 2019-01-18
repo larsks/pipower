@@ -74,8 +74,9 @@ void setup() {
     // PIN_EN and PIN_SHUTDOWN are outputs
     DDRB = 1<<PIN_EN | 1<<PIN_SHUTDOWN;
 
-    // Enable pin change interrupts
-    GIMSK |= 1<<PCIE;
+    // Enable pin change interrupts on pins PIN_POWER and PIN_USB
+    // (but note that we do not enable pin change interrupts in
+    // GIMSK here).
     PCMSK |= 1<<(PIN_POWER) | 1<<(PIN_USB);
 
     power_button = button_new(PIN_POWER);
@@ -84,6 +85,17 @@ void setup() {
 
     init_millis();
 }
+
+/** Enable pin change interrupts in GIMS */
+void enable_pcie() {
+    GIMSK |= 1<<PCIE;
+}
+
+/** Disable pin change interrupts in GIMS */
+void disable_pcie() {
+    GIMSK &= ~(1<<PCIE);
+}
+
 
 /** Runs periodically */
 void loop() {
@@ -219,8 +231,10 @@ void loop() {
 
         case STATE_IDLE0:
             // Enter low power mode.
+            enable_pcie();
             set_sleep_mode(SLEEP_MODE_PWR_DOWN);
             sleep_mode();
+            disable_pcie();
             state = STATE_IDLE1;
 
         case STATE_IDLE1:
