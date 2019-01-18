@@ -33,6 +33,11 @@ Input *input_new(int pin, bool pullup) {
     return input;
 }
 
+/** Destroy a input object */
+void input_delete(Input *input) {
+    free(input);
+}
+
 /** Read the state of the pin */
 void input_update(Input *input) {
     input->state = !(!(PINB & (1<<input->pin)));

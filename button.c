@@ -38,6 +38,11 @@ Button *button_new(uint8_t pin) {
     return button;
 }
 
+/** Destroy a button object */
+void button_delete(Button *button) {
+    free(button);
+}
+
 /** Push current button state onto history. */
 void button_update(Button *button) {
     button->history = button->history << 1;

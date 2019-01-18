@@ -14,6 +14,7 @@ extern "C" {
 typedef struct Input Input;
 
 extern Input *input_new(int pin, bool pullup);
+extern void input_delete(Input *);
 extern void input_update(Input *);
 extern bool input_went_high(Input *);
 extern bool input_went_low(Input *);
