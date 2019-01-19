@@ -1,5 +1,7 @@
 [Unit]
 Description=[pipower] Assert BOOT signal
+DefaultDependencies=no
+After=final.target systemd-journald.service
 
 [Service]
 Type=oneshot
