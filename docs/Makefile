@@ -1,6 +1,3 @@
-%.pdf: %.ps
-	ps2pdf $< $@
-
 default: html
 
 .PHONY: default html
