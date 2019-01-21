@@ -28,11 +28,25 @@
  */
 #define ONE_SECOND 1000
 #define TIMER_BUTTON 10                     /**< Period for reading button state */
+#ifndef TIMER_POWERWAIT
 #define TIMER_POWERWAIT (1 * ONE_SECOND)    /**< How long to wait for USB to stabilize */
+#endif
+
+#ifndef TIMER_BOOTWAIT
 #define TIMER_BOOTWAIT (30 * ONE_SECOND)    /**< How long to wait for boot */
+#endif
+
+#ifndef TIMER_SHUTDOWN
 #define TIMER_SHUTDOWN (30 * ONE_SECOND)    /**< How long to wait for shutdown */
+#endif
+
+#ifndef TIMER_POWEROFF
 #define TIMER_POWEROFF (30 * ONE_SECOND)    /**< How long to wait for power off */
+#endif
+
+#ifndef TIMER_IDLE
 #define TIMER_IDLE (5 * ONE_SECOND)         /**< How long to wait before returning to SLEEP_PWRDOWN mode */
+#endif
 
 /** @} */
 
