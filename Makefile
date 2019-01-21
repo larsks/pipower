@@ -21,7 +21,7 @@ DEPS = $(OBJS:.o=.dep)
 
 CC	= avr-gcc
 CPP	= avr-g++
-CFLAGS	= -Wall -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE)
+CFLAGS	+= -Wall -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE)
 
 all:	$(PROGNAME).hex
 
