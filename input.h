@@ -5,7 +5,7 @@
 #define _input_h
 
 #include <stdint.h>
-#include <stdbool.h>
+#include "bool.h"
 
 #ifdef __cplusplus
 extern "C" {

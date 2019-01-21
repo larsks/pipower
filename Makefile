@@ -11,34 +11,44 @@ AVR_BAUD    = 19200
 PORT	    = -P $(AVR_PORT) -b $(AVR_BAUD)
 AVRDUDE     = avrdude -v $(PORT) $(PROGRAMMER) -p $(DEVICE) $(AVR_EXTRA_ARGS)
 
+CC	= avr-gcc
+CPP	= avr-g++
+
+ifeq ($(SIM), 1)
+OFLAG ?= -Og
+DEBUG ?= -g
+SIM_OBJS = simavr.o
+else
+OFLAG ?= -Os
+endif
+
+CFLAGS	+= -Wall $(DEBUG) $(OFLAG) -DF_CPU=$(CLOCK) -mmcu=$(DEVICE)
+
 OBJS = \
 	pipower.o \
 	button.o \
 	input.o \
-	millis.o
+	millis.o \
+	$(SIM_OBJS)
 
 DEPS = $(OBJS:.o=.dep)
-
-CC	= avr-gcc
-CPP	= avr-g++
-CFLAGS	+= -Wall -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE)
 
 all:	$(PROGNAME).hex
 
 %.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 
 %.dep: %.c
-	$(CC) $(CFLAGS) -MM $< -o $@
+	$(CC) $(CPPFLAGS) $(CFLAGS) -MM $< -o $@
 
 %.pre: %.c
-	$(CPP) $(CFLAGS) -E $< -o $@
+	$(CPP) $(CPPFLAGS) $(CFLAGS) -E $< -o $@
 
 %.o: %.S
-	$(CC) $(CFLAGS) -x assembler-with-cpp -c $< -o $@
+	$(CC) $(CPPFLAGS) $(CFLAGS) -x assembler-with-cpp -c $< -o $@
 
 %.s: %.c
-	$(CC) $(CFLAGS) -S $< -o $@
+	$(CC) $(CPPFLAGS) $(CFLAGS) -S $< -o $@
 
 .PHONY: all deps flash fuse make load clean
 

@@ -5,7 +5,7 @@
  * <https://hackaday.com/2015/12/10/embed-with-elliot-debounce-your-noisy-buttons-part-ii/>
  */
 
-#include <stdbool.h>
+#include "bool.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <avr/io.h>

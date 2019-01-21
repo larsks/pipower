@@ -2,7 +2,7 @@
  * \file input.c
  */
 
-#include <stdbool.h>
+#include "bool.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <avr/io.h>
@@ -19,6 +19,8 @@ typedef struct Input {
 Input *input_new(int pin, bool pullup) {
     Input *input = (Input *)malloc(sizeof(Input));
     input->pin = pin;
+    input->state = false;
+    input->last_state = false;
 
     // Ensure pin is an input.
     DDRB &= ~(1<<pin);
@@ -40,7 +42,7 @@ void input_delete(Input *input) {
 
 /** Read the state of the pin */
 void input_update(Input *input) {
-    input->state = !(!(PINB & (1<<input->pin)));
+    input->state = (PINB & (1<<input->pin))?1:0;
 }
 
 /** Return true if the pin state has gone high.
