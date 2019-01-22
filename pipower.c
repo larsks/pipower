@@ -65,6 +65,9 @@ unsigned long time_pressed;                 /**< Current press duration */
 /** Current run state. */
 enum STATE state = STATE_START;
 
+/** Allow debugger to trigger exit from main loop */
+bool quit = false;
+
 Input *usb;     /**< USB signal from PowerBoost */
 Input *boot;    /**< BOOT signal from Raspberry Pi */
 
@@ -255,13 +258,17 @@ void loop() {
                 state = STATE_POWERON;
             }
             break;
+
+        case STATE_QUIT:
+            // never reached without debugger intervention
+            return;
     }
 }
 
 int main() {
     setup();
 
-    while (1) {
+    while (state != STATE_QUIT) {
         loop();
     }
 }
