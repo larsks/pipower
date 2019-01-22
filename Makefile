@@ -1,35 +1,28 @@
 PROGNAME    = pipower
+
+AVR_BAUD    ?= 19200
+AVR_PORT    ?= /dev/ttyACM0
+FUSE_EXT    ?= 0xff
+FUSE_HIGH   ?= 0xdf
+FUSE_LOW    ?= 0x62
+PROGRAMMER  ?= -c arduino 
+
 DEVICE      = attiny85
 CLOCK       = 1000000
-PROGRAMMER  = -c arduino 
-FUSE_LOW    = 0x62
-FUSE_HIGH   = 0xdf
-FUSE_EXT    = 0xff
 FUSES       = -U lfuse:w:$(FUSE_LOW):m -U hfuse:w:$(FUSE_HIGH):m -U efuse:w:$(FUSE_EXT):m 
-AVR_PORT    = /dev/ttyACM0
-AVR_BAUD    = 19200
 PORT	    = -P $(AVR_PORT) -b $(AVR_BAUD)
 AVRDUDE     = avrdude -v $(PORT) $(PROGRAMMER) -p $(DEVICE) $(AVR_EXTRA_ARGS)
 
 CC	= avr-gcc
 CPP	= avr-g++
 
-ifeq ($(SIM), 1)
-OFLAG ?= -Og
-DEBUG ?= -g
-SIM_OBJS = simavr.o
-else
-OFLAG ?= -Os
-endif
-
 CFLAGS	+= -Wall $(DEBUG) $(OFLAG) -DF_CPU=$(CLOCK) -mmcu=$(DEVICE)
 
-OBJS = \
+OBJS += \
 	pipower.o \
 	button.o \
 	input.o \
-	millis.o \
-	$(SIM_OBJS)
+	millis.o
 
 DEPS = $(OBJS:.o=.dep)
 
