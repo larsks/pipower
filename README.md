@@ -23,6 +23,18 @@ When the Pi boots, it must signal to the mc that it has booted successfully by b
 
 If external power is lost while the Pi is running, or if you press the power button while the Pi is running, the mc will send the `SHUTDOWN` signal to the Pi.  It will then wait up to 30 seconds for the Pi to shut down.  The Pi can signal a clean shutdown by setting the `BOOT` line high.  Once the shutdown is complete (or if 30 seconds pass), the mc will remove power from the Pi and return to low power mode.
 
+## Installing pipower
+
+Run `make` to build the executable:
+
+    make
+
+Run `make flash` to upload the image to your attiny85:
+
+    make flash
+
+The `Makefile` assumes you are using an Arduino UNO as your ISP. If you're using something else you will need to update the Makefile appropriately.
+
 ## Pins
 
 - `PB0` - `USB` line from PowerBoost
