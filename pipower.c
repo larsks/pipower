@@ -158,7 +158,7 @@ void loop() {
             break;
 
         case STATE_POWERWAIT1:
-            if (input_went_low(usb)) {
+            if (input_is_low(usb)) {
                 state = STATE_POWEROFF2;
             } else if (now - timer_start > TIMER_POWERWAIT) {
                 state = STATE_POWERON;
