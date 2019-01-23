@@ -3,3 +3,4 @@
 *.hex
 *.pre
 *.dep
+GNUmakefile
