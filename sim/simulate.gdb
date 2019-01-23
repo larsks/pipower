@@ -29,6 +29,14 @@ define log
 	printf "\n* %s\n", $arg0
 end
 
+# run until we reach the given state
+define run_until_state
+    disable 1
+    tb loop if $arg0 == state
+    c
+    enable 1
+end
+
 ##
 ## Execution starts here
 ##
@@ -50,15 +58,13 @@ wait_for 100
 # enable external power
 log "setting PIN_USB"
 set PINB=PINB | 1<<PIN_USB
+run_until_state STATE_BOOTWAIT1
 wait_for 100
 
 # assert BOOT
 log "resetting PIN_BOOT"
 set PINB=PINB & ~(1<<PIN_BOOT)
-disable 1
-tb loop if STATE_BOOT == state
-c
-enable 1
+run_until_state STATE_BOOT
 
 ##
 ## ...the pi has booted...
@@ -68,10 +74,7 @@ wait_for 1000
 # request a shutdown by pressing the power button
 log "pressing power button"
 short_press
-disable 1
-tb loop if STATE_SHUTDOWN1 == state
-c
-enable 1
+run_until_state STATE_SHUTDOWN1
 
 # de-assert BOOT
 wait_for 100
@@ -80,21 +83,13 @@ set PINB=PINB | 1<<PIN_BOOT
 
 # step through state transitions until we reach
 # STATE_IDLE2
-disable 1
-tb loop if STATE_POWEROFF0 == state
-c
-tb loop if STATE_POWEROFF1 == state
-c
-tb loop if STATE_POWEROFF2 == state
-c
-tb loop if STATE_IDLE0 == state
-c
+run_until_state STATE_POWEROFF0
+run_until_state STATE_POWEROFF1
+run_until_state STATE_POWEROFF2
 log "entering idle mode"
-tb loop if STATE_IDLE1 == state
-c
-tb loop if STATE_IDLE2 == state
-c
-enable 1
+run_until_state STATE_IDLE0
+run_until_state STATE_IDLE1
+run_until_state STATE_IDLE2
 
 wait_for 100
 
