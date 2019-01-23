@@ -9,6 +9,7 @@
 #include <avr/interrupt.h>
 #include <avr/sleep.h>
 
+#include "bool.h"
 #include "button.h"
 #include "millis.h"
 #include "input.h"
@@ -109,8 +110,8 @@ void disable_pcie() {
 
 /** Runs periodically */
 void loop() {
-    uint8_t long_press = 0;
-    uint8_t short_press = 0;
+    bool long_press = false,
+         short_press = false;
 
     now = millis();
     input_update(usb);
@@ -125,11 +126,11 @@ void loop() {
     } else if (button_is_pressed(power_button)) {
         time_pressed = now;
     } else if (button_is_released(power_button)) {
-        short_press = 1;
+        short_press = true;
     } else if (button_is_down(power_button)) {
         unsigned long delta = now - time_pressed;
         if (delta > LONG_PRESS_DURATION) {
-            long_press = 1;
+            long_press = true;
             power_button_state = BUTTON_IGNORE;
         }
     }
