@@ -161,7 +161,7 @@ void loop() {
         case STATE_POWERWAIT1:
             if (input_is_low(usb)) {
                 state = STATE_POWEROFF2;
-            } else if (now - timer_start > TIMER_POWERWAIT) {
+            } else if (now - timer_start >= TIMER_POWERWAIT) {
                 state = STATE_POWERON;
             }
             break;
@@ -180,7 +180,7 @@ void loop() {
 
         case STATE_BOOTWAIT1:
             // Wait for Pi to assert BOOT or timeout
-            if (now - timer_start > TIMER_BOOTWAIT) {
+            if (now - timer_start >= TIMER_BOOTWAIT) {
                 state = STATE_POWEROFF2;
             } else if (input_is_low(boot)) {
                 state = STATE_BOOT;
@@ -205,7 +205,7 @@ void loop() {
 
         case STATE_SHUTDOWN1:
             // Wait for Pi to de-assert BOOT or timeout
-            if (now - timer_start > TIMER_SHUTDOWN) {
+            if (now - timer_start >= TIMER_SHUTDOWN) {
                 state = STATE_POWEROFF0;
             } else if (input_is_high(boot)) {
                 state = STATE_POWEROFF0;
@@ -217,10 +217,11 @@ void loop() {
             PORTB &= ~(1<<PIN_SHUTDOWN);
             timer_start = now;
             state = STATE_POWEROFF1;
+            break;
 
         case STATE_POWEROFF1:
             // Wait for poweroff timer to expire.
-            if (now - timer_start > TIMER_POWEROFF) {
+            if (now - timer_start >= TIMER_POWEROFF) {
                 state = STATE_POWEROFF2;
             } else if (input_is_low(boot)) {
                 // Pi has re-asserted BOOT
@@ -242,13 +243,15 @@ void loop() {
             sleep_mode();
             disable_pcie();
             state = STATE_IDLE1;
+            break;
 
         case STATE_IDLE1:
             timer_start = now;
             state = STATE_IDLE2;
+            break;
 
         case STATE_IDLE2:
-            if (now - timer_start > TIMER_IDLE) {
+            if (now - timer_start >= TIMER_IDLE) {
                 // return to low power mode if nothing to do
                 state = STATE_IDLE0;
             } else if (short_press && input_is_high(usb)) {
@@ -261,7 +264,8 @@ void loop() {
             break;
 
         case STATE_QUIT:
-            // never reached without debugger intervention
+            /* This state is only used during debugging to force a main loop
+             * exit. */
             return;
     }
 }
