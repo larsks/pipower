@@ -9,4 +9,7 @@ ifeq ($(TRACE), 1)
 OBJS = simavr.o
 endif
 
+%.svg: %.dot
+	dot -T svg -o $@ $<
+
 include ../Makefile
