@@ -6,10 +6,14 @@ DEBUG ?= -g
 VPATH = ..
 
 ifeq ($(TRACE), 1)
-OBJS = simavr.o
+OBJS += simavr.o
 endif
 
 %.svg: %.dot
 	dot -T svg -o $@ $<
 
 include ../Makefile
+
+.PHONY: simavr
+simavr:
+	simavr -m attiny85 -f 1000000 pipower.elf -t -g
