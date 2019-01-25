@@ -21,6 +21,9 @@ enum STATE {
     STATE_IDLE0,        /**< Enter low-power mode */
     STATE_IDLE1,        /**< Start idle timer */
     STATE_IDLE2,        /**< Wait for power button press */
+    STATE_UNMANAGED0,   /**< Do not manage power */
+    STATE_UNMANAGED1,   /**< Do not manage power */
+    STATE_UNMANAGED2,   /**< Do not manage power */
     STATE_QUIT          /**< Force main loop exit (debugging) */
 };
 

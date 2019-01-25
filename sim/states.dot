@@ -14,6 +14,9 @@ digraph pipower_states {
     STATE_IDLE0;
     STATE_IDLE1;
     STATE_IDLE2;
+    STATE_UNMANAGED0;
+    STATE_UNMANAGED1;
+    STATE_UNMANAGED2;
 
     # The following is true but needlessly complicates the graph.
     #STATE_POWERWAIT0->STATE_POWEROFF2 [label="Long press"];
@@ -50,4 +53,9 @@ digraph pipower_states {
     STATE_IDLE1->STATE_IDLE2;
     STATE_IDLE2->STATE_IDLE0 [label="Timer expired"];
     STATE_IDLE2->STATE_POWERON [label="Short press or USB went high"];
+    STATE_IDLE2->STATE_UNMANAGED0 [label="Long press"];
+    STATE_UNMANAGED0->STATE_UNMANAGED1 [label="Pin change interrupt"];
+    STATE_UNMANAGED1->STATE_UNMANAGED2;
+    STATE_UNMANAGED2->STATE_POWEROFF2 [label="Long press"];
+    STATE_UNMANAGED2->STATE_UNMANAGED0 [label="Timer expired"];
 }

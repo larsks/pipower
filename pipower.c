@@ -137,7 +137,11 @@ void loop() {
 
     // At any point, a long press will force the power off.
     if (long_press) {
-        state = STATE_POWEROFF2;
+        if (state == STATE_IDLE2) {
+            state = STATE_UNMANAGED0;
+        } else {
+            state = STATE_POWEROFF2;
+        }
     }
 
     switch(state) {
@@ -260,6 +264,30 @@ void loop() {
             } else if (input_went_high(usb)) {
                 // power on if power is restored
                 state = STATE_POWERON;
+            }
+            break;
+
+        case STATE_UNMANAGED0:
+            // Enter low power mode.
+            enable_pcie();
+            set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+            sleep_mode();
+            disable_pcie();
+            state = STATE_UNMANAGED1;
+            break;
+
+        case STATE_UNMANAGED1:
+            timer_start = now;
+            state = STATE_UNMANAGED2;
+            break;
+
+        case STATE_UNMANAGED2:
+            if (now - timer_start >= TIMER_IDLE) {
+                // return to low power mode if nothing to do
+                state = STATE_UNMANAGED0;
+            } else if (short_press) {
+                // short press in this state will toggle power
+                PORTB ^= 1<<PIN_EN;
             }
             break;
 
