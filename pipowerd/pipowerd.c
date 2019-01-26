@@ -41,6 +41,7 @@
 
 #define OPTSTRING "d:p:c:vih"
 
+/** Configure options handling */
 const struct option longopts[] = {
     {"gpio-device", required_argument, 0, OPT_GPIO_DEV},
     {"gpio-pin", required_argument, 0, OPT_PIN},
@@ -50,19 +51,19 @@ const struct option longopts[] = {
     {"help", no_argument, 0, OPT_HELP},
 };
 
+/** Holds our global configuration */
 struct config {
-    char *device;
+    char *device;               /**< path to gpiochip device */
 
-    int pin,
-        verbose;
+    int pin,                    /**< pin to monitor for shutdown events */
+        verbose;                /**< control how verbose we are */
 
-    bool ignore_initial_state;
+    bool ignore_initial_state;  /**< do not exit if shutdown pin is high at start */
 
-    char *shutdown_command;
+    char *shutdown_command;     /**< command to run when we receive a shutdown request */
 } config;
 
-bool flag_shutdown = false;
-
+/** Initialize global configuration with default values */
 void init_config() {
     config.device = DEFAULT_GPIO_DEV;
     config.pin = DEFAULT_PIN;
@@ -70,26 +71,20 @@ void init_config() {
     config.shutdown_command = DEFAULT_SHUTDOWN_COMMAND;
 }
 
-void handle_shutdown() {
-	flag_shutdown = true;
-}
-
-bool check_shutdown() {
-}
-
+/** Display a usage message */
 void usage(FILE *out) {
     fprintf(out, "pipower: usage: pipower [-d <device>] [-p <pin>] "
                  "[-c <shutdown_command> ] [-vi]\n");
 }
 
-void delay(long ms) {
-    struct timespec ts;
-
-    ts.tv_sec = (ms/1000);
-    ts.tv_nsec = (ms-((ms/1000)*1000)) * 1000000;
-    nanosleep(&ts, NULL);
-}
-
+/** Loop until we detect a shutdown request.
+ *
+ * First check the initial state of the shutdown pin. If a shutdown
+ * request has been asserted, exit immediately unless
+ * `--ignore-initial-state` was provided.  If there is no active
+ * shutdown request, monitor the pin for rising edge events and exit
+ * when one is received.
+ */
 void monitor_shutdown_pin() {
     struct gpioevent_request req;
     struct gpiohandle_data data;
@@ -109,6 +104,8 @@ void monitor_shutdown_pin() {
     req.eventflags = GPIOEVENT_REQUEST_RISING_EDGE;
     strcpy(req.consumer_label, "pipower-shutdown");
 
+    // Request an file descriptor for monitor events and
+    // set the line label
     ret = ioctl(fd, GPIO_GET_LINEEVENT_IOCTL, &req);
     if (ret == -1) {
         ret = -errno;
@@ -117,6 +114,7 @@ void monitor_shutdown_pin() {
         exit(ret);
     }
 
+    /* Get current value of pin */
     ret = ioctl(req.fd, GPIOHANDLE_GET_LINE_VALUES_IOCTL, &data);
     if (ret == -1) {
         ret = -errno;
@@ -158,16 +156,15 @@ void monitor_shutdown_pin() {
                 exit(ret);
         }
 
+        // If we get this far we have successfully received a rising
+        // edge event, so exit the loop and return to `main()`.
         break;
     }
 }
 
-int main(int argc, char *argv[]) {
+void parse_args(int argc, char *argv[]) {
     int option_index = 0;
     int ch;
-    int shutdown_state;
-
-    init_config();
 
     while (EOF != (ch = getopt_long(argc, argv, OPTSTRING, longopts, &option_index))) {
         switch (ch) {
@@ -206,6 +203,12 @@ int main(int argc, char *argv[]) {
                 break;
         }
     }
+
+}
+
+int main(int argc, char *argv[]) {
+    init_config();
+    parse_args(argc, argv);
 
     if (config.verbose > 0)
 	    printf("pipower: starting, device=%s pin=%d\n",
