@@ -21,24 +21,28 @@
 #include <linux/gpio.h>
 
 #ifndef DEFAULT_GPIO_DEV
+/** On which gpio device is our pin of interest? */
 #define DEFAULT_GPIO_DEV "/dev/gpiochip0"
 #endif
 
 #ifndef DEFAULT_PIN
+/** GPIO pin to monitor for the shutdown signal */
 #define DEFAULT_PIN 17
 #endif
 
 #ifndef DEFAULT_SHUTDOWN_COMMAND
+/** Command to run when a shutdown signal is received */
 #define DEFAULT_SHUTDOWN_COMMAND "/bin/systemctl poweroff"
 #endif
 
-#define OPT_GPIO_DEV 'd'
-#define OPT_PIN 'p'
-#define OPT_SHUTDOWN_COMMAND 'c'
-#define OPT_VERBOSE 'v'
-#define OPT_IGNORE_INITIAL_STATE 'i'
-#define OPT_HELP 'h'
+#define OPT_GPIO_DEV 'd'                /**< `--device|-d <device>` */
+#define OPT_PIN 'p'                     /**< `--pin|-p <pin>` */
+#define OPT_SHUTDOWN_COMMAND 'c'        /**< `--shutdown-command|-c <command> ` */
+#define OPT_VERBOSE 'v'                 /**< `--verbose|-v` (may be specified multiple times) */
+#define OPT_IGNORE_INITIAL_STATE 'i'    /**< `--ignore-initial-state|-i` */
+#define OPT_HELP 'h'                    /**< `--help|-h` */
 
+/** Valid single character options */
 #define OPTSTRING "d:p:c:vih"
 
 /** Configure options handling */
@@ -126,10 +130,10 @@ void monitor_shutdown_pin() {
     if (data.values[0]) {
         if (config.ignore_initial_state) {
             if (config.verbose > 0)
-                printf("pipower: ignoring active shutdown request\n");
+                fprintf(stderr, "pipower: ignoring active shutdown request\n");
 
         } else {
-            printf("pipower: shutdown request is already active\n");
+            fprintf(stderr, "pipower: shutdown request is already active\n");
             return;
         }
     }
@@ -162,6 +166,7 @@ void monitor_shutdown_pin() {
     }
 }
 
+/** Handle command line options */
 void parse_args(int argc, char *argv[]) {
     int option_index = 0;
     int ch;
@@ -175,7 +180,7 @@ void parse_args(int argc, char *argv[]) {
             case OPT_PIN:
                 config.pin = atoi(optarg);
                 if (config.pin == 0) {
-                    printf("pipower: invalid shutdown pin specification: %s\n", optarg);
+                    fprintf(stderr, "pipower: invalid shutdown pin specification: %s\n", optarg);
                     exit(1);
                 }
                 break;
@@ -211,15 +216,15 @@ int main(int argc, char *argv[]) {
     parse_args(argc, argv);
 
     if (config.verbose > 0)
-	    printf("pipower: starting, device=%s pin=%d\n",
+	    fprintf(stderr, "pipower: starting, device=%s pin=%d\n",
                 config.device, config.pin);
 
     monitor_shutdown_pin();
 
     if (config.verbose > 0)
-	    printf("pipower: received shutdown signal\n");
+	    fprintf(stderr, "pipower: received shutdown signal\n");
         if (config.verbose > 1)
-            printf("pipower: running shutdown command: %s\n",
+            fprintf(stderr, "pipower: running shutdown command: %s\n",
                     config.shutdown_command);
 
     system(config.shutdown_command);
