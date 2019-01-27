@@ -16,7 +16,7 @@ AVRDUDE     = avrdude -v $(PORT) $(PROGRAMMER) -p $(DEVICE) $(AVR_EXTRA_ARGS)
 CC	= avr-gcc
 CPP	= avr-g++
 
-CFLAGS	+= -Wall $(DEBUG) $(OFLAG) -DF_CPU=$(CLOCK) -mmcu=$(DEVICE)
+CFLAGS	+= -Wall $(DEBUG) $(OFLAG) -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) --short-enums
 
 OBJS += \
 	pipower.o \
