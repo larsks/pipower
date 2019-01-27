@@ -10,7 +10,7 @@ EnvironmentFile=-/etc/default/pipower
 RemainAfterExit=true
 ExecStartPre=/usr/bin/gpio -g mode $PIN_BOOT output
 ExecStart=/usr/bin/gpio -g write $PIN_BOOT 0
-ExecStopPost=/bin/sh -c "test -f /run/pipower/inhibit || /usr/bin/gpio -g write $PIN_BOOT 1"
+ExecStopPost=/usr/bin/gpio -g write $PIN_BOOT 1
 
 [Install]
 WantedBy=multi-user.target

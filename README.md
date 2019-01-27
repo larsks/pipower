@@ -23,7 +23,7 @@ When the Pi boots, it must signal to the mc that it has booted successfully by b
 
 If external power is lost while the Pi is running, or if you press the power button while the Pi is running, the mc will send the `SHUTDOWN` signal to the Pi.  It will then wait up to 30 seconds for the Pi to shut down.  The Pi can signal a clean shutdown by setting the `BOOT` line high.  Once the shutdown is complete (or if 30 seconds pass), the mc will remove power from the Pi and return to low power mode.
 
-## Installing pipower
+## Installing pipower on your attiny85
 
 Run `make` to build the executable:
 
@@ -43,17 +43,38 @@ The `Makefile` assumes you are using an Arduino UNO as your ISP. If you're using
 - `PB3` - `BOOT` signal from Raspberry Pi
 - `PB4` - `SHUTDOWN` signal to Raspberry Pi
 
-## Systemd units
+## Installing on your Raspberry Pi
 
-You can configure these services by creating the file `/etc/default/pipower` and setting one or more of `PIN_SHUTDOWN` and `PIN_BOOT`.
+The `pipowerd` directory contains the components that need to be installed on your Raspberry Pi.  Clone the repository onto your Pi, cd into the `pipowerd` directory, and run:
 
-- `pipower-up.service`
+    make
+
+This will build the `pipowerd` executable, which is a daemon that will monitor a GPIO pin for the shutdown signal from `pipower`. When it receives the shutdown signal it runs `systemctl poweroff`.
+
+To install `pipowerd` and the associated `systemd` units, run:
+
+    make install
+
+To enable the new services, run:
+
+    make activate
+
+### systemd units
+
+The `Makefile` will install the following systemd units:
+
+- `pipower-boot.service`
 
   Asserts the `BOOT` signal on `PIN_BOOT` (default `GPIO4`) when the Pi boots and de-asserts it on shutdown.
 
-- `pipower-down.service`
+- `pipowerd.service`
 
-  Responds to the `SHUTDOWN` signal on `PIN_SHUTDOWN` (default `GPIO17`) from power controller by powering off the Pi.
+  Launches the `pipowerd` daemon to monitor for shutdown signals on `PIN_SHUTDOWN`.
+
+You can configure these services by creating the file `/etc/default/pipower`, which may set one or more of the following variables:
+
+- `PIN_POWER` - BCM GPIO on which to assert the `BOOT` signal.
+- `PIN_SHUTDOWN` - BCM GPIO on which to watch for the `SHUTDOWN` signal
 
 ## See also
 
