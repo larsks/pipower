@@ -15,9 +15,14 @@
 extern "C" {
 #endif
 
-typedef struct Button Button;
+typedef struct Button {
+    uint8_t pin,        /**< Pin to which button is attached */
+            history,    /**< Button state history */
+            poll_freq,  /**< How often (in ms) to check button state */
+            last_poll;  /**< Time at which we last checked button state */
+} Button;
 
-extern Button *button_new(uint8_t pin, uint8_t poll_freq);
+void button_new(Button *button, uint8_t pin, uint8_t poll_freq);
 extern void button_destroy(Button *);
 extern void button_update(Button *);
 extern bool button_is_pressed(Button *);

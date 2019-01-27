@@ -9,15 +9,8 @@
 
 #include "input.h"
 
-typedef struct Input {
-    uint8_t pin;        /**< Pin associated with this input */
-    bool state,         /**< Current pin state */
-         last_state;    /**< Pin state last time we checked */
-} Input;
-
 /** Create a new Input object */
-Input *input_new(int pin, bool pullup) {
-    Input *input = (Input *)malloc(sizeof(Input));
+void input_new(Input *input, int pin, bool pullup) {
     input->pin = pin;
     input->state = false;
     input->last_state = false;
@@ -32,12 +25,6 @@ Input *input_new(int pin, bool pullup) {
 
     input_update(input);
     input->last_state = input->state;
-    return input;
-}
-
-/** Destroy a input object */
-void input_delete(Input *input) {
-    free(input);
 }
 
 /** Read the state of the pin */

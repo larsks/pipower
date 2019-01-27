@@ -58,7 +58,7 @@ unsigned long timer_start = 0;  /**< Generic timer used in state transitions */
  * @{
  */
 
-Button *power_button;                       /**< Power button */
+Button power_button;                       /**< Power button */
 uint8_t power_button_state = BUTTON_NORMAL; /**< Power button current state */
 unsigned long time_pressed;                 /**< Current press duration */
 /** @} */
@@ -69,8 +69,8 @@ enum STATE state = STATE_START;
 /** Allow debugger to trigger exit from main loop */
 bool quit = false;
 
-Input *usb;     /**< USB signal from PowerBoost */
-Input *boot;    /**< BOOT signal from Raspberry Pi */
+Input usb;     /**< USB signal from PowerBoost */
+Input boot;    /**< BOOT signal from Raspberry Pi */
 
 /** Trigger wake from power-down mode on pin change interrupt.
  *
@@ -90,9 +90,9 @@ void setup() {
     // GIMSK here).
     PCMSK |= 1<<(PIN_POWER) | 1<<(PIN_USB);
 
-    power_button = button_new(PIN_POWER, TIMER_BUTTON);
-    usb = input_new(PIN_USB, false);
-    boot = input_new(PIN_BOOT, true);
+    button_new(&power_button, PIN_POWER, TIMER_BUTTON);
+    input_new(&usb, PIN_USB, false);
+    input_new(&boot, PIN_BOOT, true);
 
     init_millis();
 }
@@ -114,20 +114,20 @@ void loop() {
          short_press = false;
 
     now = millis();
-    input_update(usb);
-    input_update(boot);
-    button_update(power_button);
+    input_update(&usb);
+    input_update(&boot);
+    button_update(&power_button);
 
     // Detect short and long presses
     if (power_button_state == BUTTON_IGNORE) {
-        if (button_is_released(power_button)) {
+        if (button_is_released(&power_button)) {
             power_button_state = BUTTON_NORMAL;
         }
-    } else if (button_is_pressed(power_button)) {
+    } else if (button_is_pressed(&power_button)) {
         time_pressed = now;
-    } else if (button_is_released(power_button)) {
+    } else if (button_is_released(&power_button)) {
         short_press = true;
-    } else if (button_is_down(power_button)) {
+    } else if (button_is_down(&power_button)) {
         unsigned long delta = now - time_pressed;
         if (delta > LONG_PRESS_DURATION) {
             long_press = true;
@@ -146,7 +146,7 @@ void loop() {
 
     switch(state) {
         case STATE_START:
-            if (input_is_high(usb)) {
+            if (input_is_high(&usb)) {
                 // USB goes high briefly when the microcontroller starts
                 // up. Wait a second for it to stabilize before we try to
                 // boot.
@@ -163,7 +163,7 @@ void loop() {
             break;
 
         case STATE_POWERWAIT1:
-            if (input_is_low(usb)) {
+            if (input_is_low(&usb)) {
                 state = STATE_POWEROFF2;
             } else if (now - timer_start >= TIMER_POWERWAIT) {
                 state = STATE_POWERON;
@@ -186,16 +186,16 @@ void loop() {
             // Wait for Pi to assert BOOT or timeout
             if (now - timer_start >= TIMER_BOOTWAIT) {
                 state = STATE_POWEROFF2;
-            } else if (input_is_low(boot)) {
+            } else if (input_is_low(&boot)) {
                 state = STATE_BOOT;
             }
             break;
 
         case STATE_BOOT:
             // Wait for power button or Pi to de-assert BOOT
-            if (short_press || input_went_low(usb)) {
+            if (short_press || input_went_low(&usb)) {
                 state = STATE_SHUTDOWN0;
-            } else if (input_is_high(boot)) {
+            } else if (input_is_high(&boot)) {
                 state = STATE_POWEROFF0;
             }
             break;
@@ -211,7 +211,7 @@ void loop() {
             // Wait for Pi to de-assert BOOT or timeout
             if (now - timer_start >= TIMER_SHUTDOWN) {
                 state = STATE_POWEROFF0;
-            } else if (input_is_high(boot)) {
+            } else if (input_is_high(&boot)) {
                 state = STATE_POWEROFF0;
             }
             break;
@@ -227,7 +227,7 @@ void loop() {
             // Wait for poweroff timer to expire.
             if (now - timer_start >= TIMER_POWEROFF) {
                 state = STATE_POWEROFF2;
-            } else if (input_is_low(boot)) {
+            } else if (input_is_low(&boot)) {
                 // Pi has re-asserted BOOT
                 state = STATE_BOOT;
             }
@@ -258,10 +258,10 @@ void loop() {
             if (now - timer_start >= TIMER_IDLE) {
                 // return to low power mode if nothing to do
                 state = STATE_IDLE0;
-            } else if (short_press && input_is_high(usb)) {
+            } else if (short_press && input_is_high(&usb)) {
                 // power on if power button pressed and power is available
                 state = STATE_POWERON;
-            } else if (input_went_high(usb)) {
+            } else if (input_went_high(&usb)) {
                 // power on if power is restored
                 state = STATE_POWERON;
             }

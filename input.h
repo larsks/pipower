@@ -11,9 +11,13 @@
 extern "C" {
 #endif
 
-typedef struct Input Input;
+typedef struct Input {
+    uint8_t pin;        /**< Pin associated with this input */
+    bool state,         /**< Current pin state */
+         last_state;    /**< Pin state last time we checked */
+} Input;
 
-extern Input *input_new(int pin, bool pullup);
+void input_new(Input *input, int pin, bool pullup);
 extern void input_delete(Input *);
 extern void input_update(Input *);
 extern bool input_went_high(Input *);

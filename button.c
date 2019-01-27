@@ -19,16 +19,8 @@
 #define BUTTON_UP       0b11111111  /**< History pattern when button is up */
 #define BUTTON_DOWN     0b00000000  /**< History pattern when button is down */
 
-typedef struct Button {
-    uint8_t pin,        /**< Pin to which button is attached */
-            history,    /**< Button state history */
-            poll_freq,  /**< How often (in ms) to check button state */
-            last_poll;  /**< Time at which we last checked button state */
-} Button;
-
 /** Create a new Button object. */
-Button *button_new(uint8_t pin, uint8_t poll_freq) {
-    Button *button = (Button *)malloc(sizeof(Button));
+void button_new(Button *button, uint8_t pin, uint8_t poll_freq) {
     button->pin = pin;
     button->history = BUTTON_UP;
     button->poll_freq = poll_freq;
@@ -39,13 +31,6 @@ Button *button_new(uint8_t pin, uint8_t poll_freq) {
 
     // set pull-up
     PORTB |= 1<<pin;
-
-    return button;
-}
-
-/** Destroy a button object */
-void button_delete(Button *button) {
-    free(button);
 }
 
 /** Push current button state onto history. */
