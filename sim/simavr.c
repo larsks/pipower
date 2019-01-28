@@ -4,6 +4,7 @@
  * This file describdes traces for simavr to collect. The metadata is stored in 
  * the .mmcu section of the compiled ELF binary.
  */
+#include <stdlib.h>
 #include <simavr/avr/avr_mcu_section.h>
 #include "pins.h"
 
@@ -22,4 +23,3 @@ const struct avr_mmcu_vcd_trace_t _mytrace[]  _MMCU_ = {
     { AVR_MCU_VCD_SYMBOL("PIN_BOOT"),     .mask = (1<<PIN_BOOT),     .what = (void*)&PINB,  },
     { AVR_MCU_VCD_SYMBOL("STATE"),                                   .what = (void*)&state, },
 };
-

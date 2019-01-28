@@ -5,6 +5,9 @@ DEBUG ?= -g
 
 VPATH = ..
 
+# Ensure malloc is available when debugging
+OBJS += force_malloc.o
+
 ifeq ($(TRACE), 1)
 OBJS += simavr.o
 endif
