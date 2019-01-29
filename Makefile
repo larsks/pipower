@@ -14,8 +14,6 @@ PORT	    = -P $(AVR_PORT) -b $(AVR_BAUD)
 AVRDUDE     = avrdude -v $(PORT) $(PROGRAMMER) -p $(DEVICE) $(AVR_EXTRA_ARGS)
 
 CC	= avr-gcc
-CPP	= avr-g++
-
 CFLAGS	+= -Wall $(DEBUG) $(OFLAG) -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) --short-enums
 
 OBJS += \
@@ -54,9 +52,6 @@ fuse:
 	$(AVRDUDE) $(FUSES)
 
 make: flash fuse
-
-load: all
-	bootloadHID $(PROGNAME).hex
 
 clean:
 	rm -f $(PROGNAME).hex $(PROGNAME).elf $(OBJS) $(DEPS)
