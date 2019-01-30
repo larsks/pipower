@@ -1,9 +1,16 @@
-default: html
+ifdef MESSAGE
+MESSAGEFLAG = -m "$(MESSAGE)"
+endif
 
-.PHONY: default html
+ifdef PUSH
+PUSHFLAG = -p
+endif
 
-html:
+all:
 	doxygen
+
+publish: all
+	ghp-import -nf $(PUSHFLAG) $(MESSAGEFLAG) html
 
 clean:
 	rm -rf html
