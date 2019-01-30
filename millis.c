@@ -50,7 +50,7 @@ void init_millis() {
 unsigned long millis() {
     unsigned long _millis;
     // Updating a 16 bit value is not an atomic operation.
-    ATOMIC_BLOCK(ATOMIC_FORCEON) {
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
         _millis = timer_millis;
     }
     
