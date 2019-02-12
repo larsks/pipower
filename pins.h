@@ -9,12 +9,10 @@
 
 #include <avr/io.h>
 
-enum PINS {
-    PIN_POWER=PB0,       /**< [INPUT] Power button */
-    PIN_USB,             /**< [INPUT] USB signal from Powerboost */
-    PIN_EN,              /**< [OUTPUT] EN to Powerboost */
-    PIN_SHUTDOWN,        /**< [OUTPUT] SHUTDOWN signal to Pi */
-    PIN_BOOT             /**< [INPUT] BOOT signal from Pi */
-};
+#define PIN_POWER    _BV(PORTB0)
+#define PIN_USB      _BV(PORTB1)
+#define PIN_EN       _BV(PORTB2)
+#define PIN_SHUTDOWN _BV(PORTB3)
+#define PIN_BOOT     _BV(PORTB4)
 
 #endif // _pins_h

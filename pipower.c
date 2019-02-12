@@ -83,12 +83,12 @@ EMPTY_INTERRUPT(PCINT0_vect);
 /** Run once when mc boots. */
 void setup() {
     // PIN_EN and PIN_SHUTDOWN are outputs
-    DDRB = 1<<PIN_EN | 1<<PIN_SHUTDOWN;
+    DDRB = PIN_EN | PIN_SHUTDOWN;
 
     // Enable pin change interrupts on pins PIN_POWER and PIN_USB
     // (but note that we do not enable pin change interrupts in
     // GIMSK here).
-    PCMSK |= 1<<(PIN_POWER) | 1<<(PIN_USB);
+    PCMSK |= PIN_POWER | PIN_USB;
 
     button_new(&power_button, PIN_POWER, TIMER_BUTTON);
     input_new(&usb, PIN_USB, false);
@@ -99,12 +99,12 @@ void setup() {
 
 /** Enable pin change interrupts in GIMS */
 void enable_pcie() {
-    GIMSK |= 1<<PCIE;
+    GIMSK |= _BV(PCIE);
 }
 
 /** Disable pin change interrupts in GIMS */
 void disable_pcie() {
-    GIMSK &= ~(1<<PCIE);
+    GIMSK &= ~(_BV(PCIE));
 }
 
 
@@ -172,7 +172,7 @@ void loop() {
 
         case STATE_POWERON:
             // Assert EN
-            PORTB |= 1<<PIN_EN;
+            PORTB |= PIN_EN;
             state = STATE_BOOTWAIT0;
             break;
 
@@ -202,7 +202,7 @@ void loop() {
 
         case STATE_SHUTDOWN0:
             // Assert SHUTDOWN
-            PORTB |= 1<<PIN_SHUTDOWN;
+            PORTB |= PIN_SHUTDOWN;
             timer_start = now;
             state = STATE_SHUTDOWN1;
             break;
@@ -218,7 +218,7 @@ void loop() {
 
         case STATE_POWEROFF0:
             // Start poweroff timer
-            PORTB &= ~(1<<PIN_SHUTDOWN);
+            PORTB &= ~(PIN_SHUTDOWN);
             timer_start = now;
             state = STATE_POWEROFF1;
             break;
@@ -235,8 +235,8 @@ void loop() {
 
         case STATE_POWEROFF2:
             // De-assert EN and SHUTDOWN
-            PORTB &= ~(1<<PIN_EN);
-            PORTB &= ~(1<<PIN_SHUTDOWN);
+            PORTB &= ~(PIN_EN);
+            PORTB &= ~(PIN_SHUTDOWN);
             state = STATE_IDLE0;
             break;
 
@@ -287,7 +287,7 @@ void loop() {
                 state = STATE_UNMANAGED0;
             } else if (short_press) {
                 // short press in this state will toggle power
-                PORTB ^= 1<<PIN_EN;
+                PORTB ^= PIN_EN;
             }
             break;
 

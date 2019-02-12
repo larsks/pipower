@@ -16,11 +16,11 @@ void input_new(Input *input, int pin, bool pullup) {
     input->last_state = false;
 
     // Ensure pin is an input.
-    DDRB &= ~(1<<pin);
+    DDRB &= ~(pin);
 
     // Set pullup if requested
     if (pullup) {
-	    PORTB |= 1<<pin;
+	    PORTB |= pin;
     }
 
     input_update(input);
@@ -29,7 +29,7 @@ void input_new(Input *input, int pin, bool pullup) {
 
 /** Read the state of the pin */
 void input_update(Input *input) {
-    input->state = (PINB & (1<<input->pin))?1:0;
+    input->state = (PINB & (input->pin)) ? 1 : 0;
 }
 
 /** Return true if the pin state has gone high.

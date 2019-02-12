@@ -39,7 +39,7 @@ void button_update(Button *button) {
 
     if (now - button->last_poll >= button->poll_freq) {
         button->history = button->history << 1;
-        button->history |= (PINB & (1<<button->pin))>>button->pin;
+        button->history |= (PINB & (button->pin)) ? 1 : 0;
         button->last_poll = now;
     }
 }
