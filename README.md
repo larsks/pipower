@@ -37,11 +37,12 @@ The `Makefile` assumes you are using an Arduino UNO as your ISP. If you're using
 
 ## Pins
 
-- `PB0` - `USB` line from PowerBoost
-- `PB1` - power button
+- `PB0` - Momentary Power Button
+- `PB1` - `USB` line from PowerBoost
 - `PB2` - `ENABLE` line to PowerBoost
-- `PB3` - `BOOT` signal from Raspberry Pi
-- `PB4` - `SHUTDOWN` signal to Raspberry Pi
+- `PB3` - `BOOT` signal from Raspberry Pi (default `GPIO4`)
+- `PB4` - `SHUTDOWN` signal to Raspberry Pi (default `GPIO17`)
+- `VCC` - `5v Power` connected to the VS output from the PowerBoost    
 
 ## Installing on your Raspberry Pi
 
@@ -78,6 +79,7 @@ You can configure these services by creating the file `/etc/default/pipower`, wh
 
 ## See also
 
+- My blog post on this project at <https://blog.oddbit.com/post/2019-01-19-pipower-a-raspberry-pi-ups/>
 - Doxygen documentation for this project is online at <http://oddbit.com/pipower>
 - [PowerBoost 1000c data sheets/pinouts/etc](https://learn.adafruit.com/adafruit-powerboost-1000c-load-share-usb-charge-boost/downloads)
 - [ATtiny85 data sheet](https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2586-AVR-8-bit-Microcontroller-ATtiny25-ATtiny45-ATtiny85_Datasheet.pdf)
